@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { acceptFriendRequest, getFriendRequests } from "../lib/api";
-import { BellIcon, ClockIcon, MessageSquareIcon, UserCheckIcon } from "lucide-react";
+import { BellIcon, ClockIcon, MessageSquareIcon, UserCheckIcon, CheckCircle, ArrowLeft } from "lucide-react";
 import NoNotificationsFound from "../components/NoNotificationsFound";
+import { Link } from "react-router";
 
 const NotificationsPage = () => {
   const queryClient = useQueryClient();
@@ -23,54 +24,107 @@ const NotificationsPage = () => {
   const acceptedRequests = friendRequests?.acceptedReqs || [];
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
+    <div className="p-4 sm:p-6 lg:p-8 min-h-screen" style={{ backgroundColor: 'var(--wa-bg-secondary)' }}>
       <div className="container mx-auto max-w-4xl space-y-8">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-6">Notifications</h1>
+        <div className="flex items-center gap-3">
+          <Link to="/" className="p-2 rounded-full hover:bg-black/5 transition-colors md:hidden">
+              <ArrowLeft className="w-5 h-5" style={{ color: 'var(--wa-icon)' }} />
+          </Link>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight" style={{ color: 'var(--wa-text-primary)' }}>
+              Notifications
+            </h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--wa-text-secondary)' }}>
+              Manage your friend requests and connections
+            </p>
+          </div>
+        </div>
 
         {isLoading ? (
           <div className="flex justify-center py-12">
-            <span className="loading loading-spinner loading-lg"></span>
+            <span className="loading loading-spinner loading-lg" style={{ color: 'var(--wa-teal)' }} />
           </div>
         ) : (
           <>
+            {/* Incoming Friend Requests */}
             {incomingRequests.length > 0 && (
               <section className="space-y-4">
-                <h2 className="text-xl font-semibold flex items-center gap-2">
-                  <UserCheckIcon className="h-5 w-5 text-primary" />
+                <h2 className="text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--wa-text-primary)' }}>
+                  <UserCheckIcon className="h-5 w-5" style={{ color: 'var(--wa-teal)' }} />
                   Friend Requests
-                  <span className="badge badge-primary ml-2">{incomingRequests.length}</span>
+                  <span 
+                    className="badge ml-2 text-xs px-2 py-1"
+                    style={{
+                      backgroundColor: 'var(--wa-teal)',
+                      color: 'white',
+                      border: 'none'
+                    }}
+                  >
+                    {incomingRequests.length}
+                  </span>
                 </h2>
 
                 <div className="space-y-3">
                   {incomingRequests.map((request) => (
                     <div
                       key={request._id}
-                      className="card bg-base-200 shadow-sm hover:shadow-md transition-shadow"
+                      className="rounded-lg wa-transition hover:shadow-wa-chat"
+                      style={{
+                        backgroundColor: 'var(--wa-bg-primary)',
+                        border: '1px solid var(--wa-border)'
+                      }}
                     >
-                      <div className="card-body p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="avatar w-14 h-14 rounded-full bg-base-300">
-                              <img src={request.sender.profilePic} alt={request.sender.fullName} />
+                      <div className="p-4">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="avatar">
+                              <div className="w-14 h-14 rounded-full overflow-hidden">
+                                <img 
+                                  src={request.sender.profilePic} 
+                                  alt={request.sender.fullName}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
                             </div>
-                            <div>
-                              <h3 className="font-semibold">{request.sender.fullName}</h3>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold truncate" style={{ color: 'var(--wa-text-primary)' }}>
+                                {request.sender.fullName}
+                              </h3>
                               <div className="flex flex-wrap gap-1.5 mt-1">
-                                <span className="badge badge-secondary badge-sm">
-                                  Native: {request.sender.nativeLanguage}
+                                <span 
+                                  className="text-xs px-2 py-0.5 rounded-full"
+                                  style={{
+                                    backgroundColor: 'var(--wa-teal)',
+                                    color: 'white'
+                                  }}
+                                >
+                                  {request.sender.nativeLanguage}
                                 </span>
-                                <span className="badge badge-outline badge-sm">
-                                  Learning: {request.sender.learningLanguage}
+                                <span 
+                                  className="text-xs px-2 py-0.5 rounded-full"
+                                  style={{
+                                    backgroundColor: 'transparent',
+                                    border: '1px solid var(--wa-border)',
+                                    color: 'var(--wa-text-secondary)'
+                                  }}
+                                >
+                                  Learning {request.sender.learningLanguage}
                                 </span>
                               </div>
                             </div>
                           </div>
 
                           <button
-                            className="btn btn-primary btn-sm"
+                            className="btn btn-sm wa-transition shrink-0"
+                            style={{
+                              backgroundColor: 'var(--wa-teal)',
+                              color: 'white',
+                              border: 'none'
+                            }}
                             onClick={() => acceptRequestMutation(request._id)}
                             disabled={isPending}
                           >
+                            <CheckCircle className="size-4 mr-1" />
                             Accept
                           </button>
                         </div>
@@ -81,38 +135,57 @@ const NotificationsPage = () => {
               </section>
             )}
 
-            {/* ACCEPTED REQS NOTIFICATONS */}
+            {/* Accepted Requests Notifications */}
             {acceptedRequests.length > 0 && (
               <section className="space-y-4">
-                <h2 className="text-xl font-semibold flex items-center gap-2">
-                  <BellIcon className="h-5 w-5 text-success" />
+                <h2 className="text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--wa-text-primary)' }}>
+                  <BellIcon className="h-5 w-5" style={{ color: 'var(--wa-teal)' }} />
                   New Connections
                 </h2>
 
                 <div className="space-y-3">
                   {acceptedRequests.map((notification) => (
-                    <div key={notification._id} className="card bg-base-200 shadow-sm">
-                      <div className="card-body p-4">
+                    <div 
+                      key={notification._id} 
+                      className="rounded-lg"
+                      style={{
+                        backgroundColor: 'var(--wa-bg-primary)',
+                        border: '1px solid var(--wa-border)'
+                      }}
+                    >
+                      <div className="p-4">
                         <div className="flex items-start gap-3">
-                          <div className="avatar mt-1 size-10 rounded-full">
-                            <img
-                              src={notification.recipient.profilePic}
-                              alt={notification.recipient.fullName}
-                            />
+                          <div className="avatar mt-1">
+                            <div className="size-10 rounded-full overflow-hidden">
+                              <img
+                                src={notification.recipient.profilePic}
+                                alt={notification.recipient.fullName}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-semibold">{notification.recipient.fullName}</h3>
-                            <p className="text-sm my-1">
-                              {notification.recipient.fullName} accepted your friend request
+                            <h3 className="font-semibold" style={{ color: 'var(--wa-text-primary)' }}>
+                              {notification.recipient.fullName}
+                            </h3>
+                            <p className="text-sm my-1" style={{ color: 'var(--wa-text-secondary)' }}>
+                              Accepted your friend request
                             </p>
-                            <p className="text-xs flex items-center opacity-70">
+                            <p className="text-xs flex items-center" style={{ color: 'var(--wa-text-tertiary)' }}>
                               <ClockIcon className="h-3 w-3 mr-1" />
                               Recently
                             </p>
                           </div>
-                          <div className="badge badge-success">
+                          <div 
+                            className="badge text-xs px-2 py-1"
+                            style={{
+                              backgroundColor: '#25d366',
+                              color: 'white',
+                              border: 'none'
+                            }}
+                          >
                             <MessageSquareIcon className="h-3 w-3 mr-1" />
-                            New Friend
+                            Connected
                           </div>
                         </div>
                       </div>
@@ -131,4 +204,5 @@ const NotificationsPage = () => {
     </div>
   );
 };
+
 export default NotificationsPage;

@@ -1,73 +1,105 @@
-import { Link, useLocation } from "react-router";
+import { useNavigate } from "react-router";
 import useAuthUser from "../hooks/useAuthUser";
-import { BellIcon, HomeIcon, ShipWheelIcon, UsersIcon } from "lucide-react";
+import { ChannelList, useChatContext } from "stream-chat-react";
+import { LogOutIcon, MessageSquarePlus, MoreVertical, CircleDashed, Users, Globe } from "lucide-react";
+import { useState } from "react";
+import useLogout from "../hooks/useLogout";
+import ThemeSelector from "./ThemeSelector";
+import CustomChannelPreview from "./CustomChannelPreview";
 
 const Sidebar = () => {
-  const { authUser } = useAuthUser();
-  const location = useLocation();
-  const currentPath = location.pathname;
+    const { authUser } = useAuthUser();
+    const navigate = useNavigate();
+    const { client } = useChatContext();
+    const { logoutMutation } = useLogout();
 
-  return (
-    <aside className="w-64 bg-base-200 border-r border-base-300 hidden lg:flex flex-col h-screen sticky top-0">
-      <div className="p-5 border-b border-base-300">
-        <Link to="/" className="flex items-center gap-2.5">
-          <ShipWheelIcon className="size-9 text-primary" />
-          <span className="text-3xl font-bold font-mono bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary  tracking-wider">
-            GupSup
-          </span>
-        </Link>
-      </div>
+    const filters = { type: "messaging", members: { $in: [authUser?._id] } };
+    const sort = { last_message_at: -1 };
 
-      <nav className="flex-1 p-4 space-y-1">
-        <Link
-          to="/"
-          className={`btn btn-ghost justify-start w-full gap-3 px-3 normal-case ${
-            currentPath === "/" ? "btn-active" : ""
-          }`}
-        >
-          <HomeIcon className="size-5 text-base-content opacity-70" />
-          <span>Home</span>
-        </Link>
+    return (
+        <aside className="w-full md:w-1/3 lg:w-[400px] flex flex-col h-full border-r border-wa-gray-200 dark:border-wa-gray-600 bg-white dark:bg-wa-gray-800">
+            {/* Header */}
+            <div className="h-[60px] flex items-center justify-between px-4 shrink-0 bg-wa-gray-50 dark:bg-wa-gray-700 border-b border-wa-gray-200 dark:border-wa-gray-600">
+                {/* Profile Picture */}
+                <div className="cursor-pointer" onClick={() => navigate("/")}>
+                   <div className="w-10 h-10 rounded-full overflow-hidden">
+                     <img src={authUser?.profilePic || "/avatar.png"} alt="Profile" className="w-full h-full object-cover" />
+                   </div>
+                </div>
 
-        <Link
-          to="/friends"
-          className={`btn btn-ghost justify-start w-full gap-3 px-3 normal-case ${
-            currentPath === "/friends" ? "btn-active" : ""
-          }`}
-        >
-          <UsersIcon className="size-5 text-base-content opacity-70" />
-          <span>Friends</span>
-        </Link>
+                {/* Header Actions */}
+                <div className="flex items-center gap-1">
+                    <button 
+                        className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors" 
+                        onClick={() => navigate("/")}
+                        title="Communities"
+                    >
+                        <Users className="size-5 text-wa-gray-500 dark:text-wa-gray-300" />
+                    </button>
+                    
+                    <button
+                         className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                         onClick={() => navigate("/notifications")}
+                         title="Notifications"
+                    >
+                         <CircleDashed className="size-5 text-wa-gray-500 dark:text-wa-gray-300" />
+                    </button>
 
-        <Link
-          to="/notifications"
-          className={`btn btn-ghost justify-start w-full gap-3 px-3 normal-case ${
-            currentPath === "/notifications" ? "btn-active" : ""
-          }`}
-        >
-          <BellIcon className="size-5 text-base-content opacity-70" />
-          <span>Notifications</span>
-        </Link>
-      </nav>
+                    <button
+                         className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                         onClick={() => navigate("/discover")}
+                         title="Discover People"
+                    >
+                         <Globe className="size-5 text-wa-gray-500 dark:text-wa-gray-300" />
+                    </button>
 
-      {/* USER PROFILE SECTION */}
-      <div className="p-4 border-t border-base-300 mt-auto">
-        <div className="flex items-center gap-3">
-          <div className="avatar">
-            <div className="w-10 rounded-full">
-              <img src={authUser?.profilePic} alt="User Avatar" />
+                    <button 
+                        className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                        onClick={() => navigate("/discover")}
+                        title="New Chat"
+                    >
+                        <MessageSquarePlus className="size-5 text-wa-gray-500 dark:text-wa-gray-300" />
+                    </button>
+
+                    <div className="dropdown dropdown-end">
+                        <div 
+                            tabIndex={0} 
+                            role="button" 
+                            className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                        >
+                            <MoreVertical className="size-5 text-wa-gray-500 dark:text-wa-gray-300" />
+                        </div>
+                        <ul 
+                            tabIndex={0} 
+                            className="dropdown-content z-[50] menu p-2 shadow-lg rounded-lg w-52 mt-4 bg-white dark:bg-wa-gray-700 text-wa-gray-800 dark:text-wa-gray-100"
+                        >
+                            <li><ThemeSelector /></li>
+                            <li>
+                                <a onClick={logoutMutation} className="hover:bg-wa-gray-100 dark:hover:bg-wa-gray-600 rounded-md">
+                                    <LogOutIcon className="size-4" />
+                                    Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div className="flex-1">
-            <p className="font-semibold text-sm">{authUser?.fullName}</p>
-            <p className="text-xs text-success flex items-center gap-1">
-              <span className="size-2 rounded-full bg-success inline-block" />
-              Online
-            </p>
-          </div>
-        </div>
-      </div>
-    </aside>
-  );
+
+            {/* Channel List */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
+                <ChannelList
+                    filters={filters}
+                    sort={sort}
+                    showChannelSearch
+                    Preview={CustomChannelPreview}
+                    additionalChannelSearchProps={{
+                        searchForChannels: true,
+                        placeholder: "Search or start new chat",
+                    }}
+                />
+            </div>
+        </aside>
+    );
 };
+
 export default Sidebar;

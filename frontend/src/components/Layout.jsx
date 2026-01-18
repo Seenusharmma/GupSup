@@ -1,19 +1,23 @@
+import { useLocation } from "react-router";
 import Sidebar from "./Sidebar";
-import Navbar from "./Navbar";
 
-const Layout = ({ children, showSidebar = false }) => {
+const Layout = ({ children }) => {
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
+
   return (
-    <div className="min-h-screen">
-      <div className="flex">
-        {showSidebar && <Sidebar />}
-
-        <div className="flex-1 flex flex-col">
-          <Navbar />
-
-          <main className="flex-1 overflow-y-auto">{children}</main>
+    <div className="flex h-screen overflow-hidden antialiased bg-wa-gray-50 dark:bg-wa-gray-700 text-wa-gray-800 dark:text-wa-gray-100">
+        {/* Sidebar - Hidden on mobile unless on home */}
+        <div className={`${isHomePage ? 'flex' : 'hidden'} md:flex h-full`}>
+            <Sidebar />
         </div>
-      </div>
+        
+        {/* Main Content - Hidden on mobile if on home */}
+        <main className={`flex-1 flex flex-col min-w-0 relative overflow-hidden ${!isHomePage ? 'flex' : 'hidden'} md:flex`}>
+            {children}
+        </main>
     </div>
   );
 };
+
 export default Layout;

@@ -100,7 +100,15 @@ const CallContent = () => {
 
   const navigate = useNavigate();
 
-  if (callingState === CallingState.LEFT) return navigate("/");
+  if (callingState === CallingState.LEFT) {
+      // Check if inside a popup window
+      if (window.opener) {
+          window.close();
+      } else {
+          return navigate("/");
+      }
+      return null;
+  }
 
   return (
     <StreamTheme>
