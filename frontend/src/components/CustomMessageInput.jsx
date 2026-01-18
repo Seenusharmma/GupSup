@@ -10,46 +10,95 @@ const CustomMessageInput = ({ quotedMessage, clearQuotedMessage }) => {
   const fileInputRef = useRef(null);
   const sendButtonRef = useRef(null);
   const textareaRef = useRef(null);
+  const inputZoneRef = useRef(null);
 
-  // Close emoji picker when clicking outside, but ignore Send button
+  // Close emoji picker when clicking outside the entire input component
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        emojiPickerRef.current && 
-        !emojiPickerRef.current.contains(event.target) &&
-        sendButtonRef.current &&
-        !sendButtonRef.current.contains(event.target)
-      ) {
+      // If picker is hidden, do nothing
+      if (!showEmojiPicker) return;
+
+      // Check if click is inside the input component or the picker
+      const isInsideInput = inputZoneRef.current && inputZoneRef.current.contains(event.target);
+      const isInsidePicker = emojiPickerRef.current && emojiPickerRef.current.contains(event.target);
+      const isInsidePickerReact = event.target.closest('.emoji-picker-react');
+
+      if (!isInsideInput && !isInsidePicker && !isInsidePickerReact) {
         setShowEmojiPicker(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [showEmojiPicker]);
 
-  const onEmojiClick = (emojiData) => {
+  const onEmojiClick = (emojiData, event) => {
+    // Prevent this click from triggering handleClickOutside
+    if (event) {
+      if (typeof event.stopPropagation === 'function') event.stopPropagation();
+      if (typeof event.preventDefault === 'function') event.preventDefault();
+    }
+
     const emoji = emojiData.emoji;
+    const currentText = text || "";
     
-    // Insert at cursor position if possible
-    let newText = text + emoji;
+    let newText;
+    let newCursorPos;
+
     if (textareaRef.current) {
         const start = textareaRef.current.selectionStart;
         const end = textareaRef.current.selectionEnd;
-        const currentVal = textareaRef.current.value;
-        if (start !== null && end !== null) {
-            newText = currentVal.substring(0, start) + emoji + currentVal.substring(end);
-        }
+        
+        newText = currentText.substring(0, start) + emoji + currentText.substring(end);
+        newCursorPos = start + emoji.length;
+        
+        // Update Stream context using the standard handleChange
+        // We pass a synthetic event that Stream's handler expects
+        handleChange({ target: { value: newText } });
+
+        // Restore focus and cursor position after React update
+        // Using a slightly longer timeout for cross-device stability
+        setTimeout(() => {
+            if (textareaRef.current) {
+                textareaRef.current.focus();
+                textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
+            }
+        }, 50);
+    } else {
+        newText = currentText + emoji;
+        handleChange({ target: { value: newText } });
     }
+  };
+
+  const toggleEmojiPicker = (e) => {
+    if (e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+    const willShow = !showEmojiPicker;
+    setShowEmojiPicker(willShow);
     
-    // Always use handleChange to sync with Stream context
-    handleChange({ target: { value: newText } });
+    // Auto-focus textarea when opening picker or interacting
+    if (textareaRef.current) {
+        textareaRef.current.focus();
+    }
+  };
+
+  const handleContainerClick = () => {
+    if (textareaRef.current) {
+        textareaRef.current.focus();
+    }
   };
 
   const handleSend = (e) => {
-      e.preventDefault();
+      if (e) e.preventDefault();
       // Ensure we submit the current state
       handleSubmit(e);
       setShowEmojiPicker(false);
+      
+      // Focus back to input after sending
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
   };
 
   const handleFileSelect = (e) => {
@@ -62,7 +111,7 @@ const CustomMessageInput = ({ quotedMessage, clearQuotedMessage }) => {
   const hasContent = text.trim().length > 0 || (attachments && attachments.length > 0) || quotedMessage;
 
   return (
-    <div className="flex flex-col w-full relative">
+    <div ref={inputZoneRef} className="flex flex-col w-full relative">
       <input 
           type="file" 
           multiple 
@@ -109,9 +158,10 @@ const CustomMessageInput = ({ quotedMessage, clearQuotedMessage }) => {
 
           <div className="flex gap-1 shrink-0 pb-1.5 md:pb-2">
             <button 
-                className={`p-2 rounded-full hover:bg-gray-200 transition-all duration-200 active:scale-95 ${showEmojiPicker ? 'bg-gray-200' : ''}`}
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                className={`p-2 rounded-full hover:bg-gray-200 transition-all duration-200 active:scale-95 emoji-btn-toggle ${showEmojiPicker ? 'bg-gray-200' : ''}`}
+                onClick={toggleEmojiPicker}
                 type="button"
+                title="Emoji"
             >
                 <Smile className={`w-6 h-6 ${showEmojiPicker ? 'text-teal-600' : 'text-[#54656f]'}`} />
             </button>
@@ -125,7 +175,10 @@ const CustomMessageInput = ({ quotedMessage, clearQuotedMessage }) => {
             </button>
           </div>
 
-          <div className="flex-1 bg-white rounded-2xl md:rounded-3xl px-4 py-2 shadow-sm border border-transparent focus-within:border-teal-500 transition-all min-h-[45px] flex items-center">
+          <div 
+             onClick={handleContainerClick}
+             className="flex-1 bg-white rounded-2xl md:rounded-3xl px-4 py-2 shadow-sm border border-transparent focus-within:border-teal-500 transition-all min-h-[45px] flex items-center cursor-text"
+          >
              <textarea 
                 ref={textareaRef}
                 value={text}

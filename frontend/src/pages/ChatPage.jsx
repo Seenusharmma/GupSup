@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams, Link } from "react-router";
+import { useParams, Link, useNavigate } from "react-router";
 import useAuthUser from "../hooks/useAuthUser";
 import { useChatContext, Channel, MessageInput, MessageList, Thread, Window } from "stream-chat-react";
 import toast from "react-hot-toast";
@@ -8,6 +8,7 @@ import { Video, MoreVertical, Search, ArrowLeft, Smile, Paperclip, Send, X } fro
 import ChatLoader from "../components/ChatLoader";
 import CustomMessage from "../components/CustomMessage";
 import CustomMessageInput from "../components/CustomMessageInput";
+import Avatar from "../components/Avatar";
 
 const ChatPage = () => {
     const { id: targetUserId } = useParams();
@@ -49,21 +50,30 @@ const ChatPage = () => {
         loadChannel();
     }, [client, authUser, targetUserId]);
 
+   const navigate = useNavigate();
+
    const handleVideoCall = () => {
     if (channel) {
-      const callUrl = `${window.location.origin}/call/${channel.id}`;
-      // Open popup window
-      window.open(
-          callUrl, 
-          "Video Call", 
-          "height=600,width=800,scrollbars=no,status=no,resizable=yes"
-      );
+      const callId = channel.id;
+      const isMobile = window.innerWidth < 768;
+
+      if (isMobile) {
+          navigate(`/call/${callId}`);
+      } else {
+          const callUrl = `${window.location.origin}/call/${callId}`;
+          // Open popup window
+          window.open(
+              callUrl, 
+              "Video Call", 
+              "height=600,width=800,scrollbars=no,status=no,resizable=yes"
+          );
+      }
       
       // Still send message
       channel.sendMessage({
-        text: `📞 Video call started. Join here: ${callUrl}`,
+        text: `📞 Video call started. Join here: ${window.location.origin}/call/${callId}`,
       });
-      toast.success("Video call started!");
+      // toast.success("Video call started!");
     }
   };
 
@@ -90,13 +100,7 @@ const ChatPage = () => {
                   
                   {/* User Avatar */}
                   <div className="relative cursor-pointer transition-transform duration-200 hover:scale-105">
-                    <div className="w-9 h-9 md:w-10 md:h-10 rounded-full overflow-hidden border border-gray-200">
-                        <img 
-                            src={otherUser?.image || "/avatar.png"} 
-                            alt={otherUser?.name || "User"} 
-                            className="w-full h-full object-cover"
-                        />
-                    </div>
+                    <Avatar user={otherUser} size="medium" />
                     {otherUser?.online && (
                         <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-[#f0f2f5]"></span>
                     )}

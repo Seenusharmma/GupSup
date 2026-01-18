@@ -6,6 +6,7 @@ import { useState } from "react";
 import useLogout from "../hooks/useLogout";
 import ThemeSelector from "./ThemeSelector";
 import CustomChannelPreview from "./CustomChannelPreview";
+import Avatar from "./Avatar";
 
 const Sidebar = () => {
     const { authUser } = useAuthUser();
@@ -22,9 +23,7 @@ const Sidebar = () => {
             <div className="h-[60px] flex items-center justify-between px-4 shrink-0 bg-wa-gray-50 dark:bg-wa-gray-700 border-b border-wa-gray-200 dark:border-wa-gray-600">
                 {/* Profile Picture */}
                 <div className="cursor-pointer" onClick={() => navigate("/")}>
-                   <div className="w-10 h-10 rounded-full overflow-hidden">
-                     <img src={authUser?.profilePic || "/avatar.png"} alt="Profile" className="w-full h-full object-cover" />
-                   </div>
+                   <Avatar user={authUser} size="medium" />
                 </div>
 
                 {/* Header Actions */}

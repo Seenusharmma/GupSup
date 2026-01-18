@@ -1,6 +1,7 @@
 import { useChatContext } from "stream-chat-react";
 import { useNavigate } from "react-router";
 import useAuthUser from "../hooks/useAuthUser";
+import Avatar from "./Avatar";
 
 const CustomChannelPreview = ({ channel, setActiveChannel }) => {
     const navigate = useNavigate();
@@ -36,11 +37,7 @@ const CustomChannelPreview = ({ channel, setActiveChannel }) => {
         >
             {/* Avatar */}
             <div className="relative shrink-0">
-                <img 
-                    src={otherMember.user?.image || "/avatar.png"} 
-                    alt={otherMember.user?.name || "User"}
-                    className="w-12 h-12 rounded-full object-cover"
-                />
+                <Avatar user={otherMember.user} size="medium" />
                 {/* Online indicator */}
                 {otherMember.user?.online && (
                     <span className="absolute bottom-0 right-0 w-3 h-3 bg-wa-green rounded-full border-2 border-white dark:border-wa-gray-800"></span>

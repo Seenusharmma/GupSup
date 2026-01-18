@@ -1,3 +1,40 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Stream Video UI Overrides */
+.str-video__call-controls {
+  background-color: transparent !important;
+  gap: 1.5rem !important;
+  padding: 0 !important;
+}
+
+.str-video__call-controls__button {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 50% !important;
+  width: 50px !important;
+  height: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: none !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.str-video__call-controls__button:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.str-video__call-controls__button--hangup {
+  background-color: #ea0038 !important;
+}
+
+.str-video__call-controls__button--hangup:hover {
+  background-color: #c90030 !important;
+}
+
+/* Hide default stream theme background if interfering */
+.str-video__paginated-grid-layout {
+    background: transparent !important;
+}
+

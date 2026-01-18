@@ -9,6 +9,7 @@ import CallPage from "./pages/CallPage.jsx";
 import ChatPage from "./pages/ChatPage.jsx";
 import OnboardingPage from "./pages/OnboardingPage.jsx";
 import DiscoverPage from "./pages/DiscoverPage.jsx";
+import PlaceholderPage from "./pages/PlaceholderPage.jsx";
 
 import { Toaster } from "react-hot-toast";
 
@@ -147,6 +148,42 @@ const App = () => {
                 isOnboarded ? (
                   <Layout>
                     <DiscoverPage />
+                  </Layout>
+                ) : (
+                  <Navigate to="/onboarding" />
+                )
+              }
+            />
+             <Route
+              path="/updates"
+              element={
+                isOnboarded ? (
+                  <Layout>
+                    <PlaceholderPage title="Updates" />
+                  </Layout>
+                ) : (
+                  <Navigate to="/onboarding" />
+                )
+              }
+            />
+             <Route
+              path="/communities"
+              element={
+                isOnboarded ? (
+                  <Layout>
+                    <PlaceholderPage title="Communities" />
+                  </Layout>
+                ) : (
+                  <Navigate to="/onboarding" />
+                )
+              }
+            />
+             <Route
+              path="/calls"
+              element={
+                isOnboarded ? (
+                  <Layout>
+                    <PlaceholderPage title="Calls" />
                   </Layout>
                 ) : (
                   <Navigate to="/onboarding" />

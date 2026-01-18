@@ -3,6 +3,7 @@ import { acceptFriendRequest, getFriendRequests } from "../lib/api";
 import { BellIcon, ClockIcon, MessageSquareIcon, UserCheckIcon, CheckCircle, ArrowLeft } from "lucide-react";
 import NoNotificationsFound from "../components/NoNotificationsFound";
 import { Link } from "react-router";
+import Avatar from "../components/Avatar";
 
 const NotificationsPage = () => {
   const queryClient = useQueryClient();
@@ -78,13 +79,7 @@ const NotificationsPage = () => {
                         <div className="flex items-center justify-between gap-4">
                           <div className="flex items-center gap-3 flex-1 min-w-0">
                             <div className="avatar">
-                              <div className="w-14 h-14 rounded-full overflow-hidden">
-                                <img 
-                                  src={request.sender.profilePic} 
-                                  alt={request.sender.fullName}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
+                              <Avatar user={request.sender} size="large" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <h3 className="font-semibold truncate" style={{ color: 'var(--wa-text-primary)' }}>
@@ -156,13 +151,7 @@ const NotificationsPage = () => {
                       <div className="p-4">
                         <div className="flex items-start gap-3">
                           <div className="avatar mt-1">
-                            <div className="size-10 rounded-full overflow-hidden">
-                              <img
-                                src={notification.recipient.profilePic}
-                                alt={notification.recipient.fullName}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
+                            <Avatar user={notification.recipient} size="medium" />
                           </div>
                           <div className="flex-1">
                             <h3 className="font-semibold" style={{ color: 'var(--wa-text-primary)' }}>

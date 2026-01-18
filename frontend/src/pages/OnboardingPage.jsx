@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { completeOnboarding } from "../lib/api";
 import { LoaderIcon, MapPinIcon, ShipWheelIcon, ShuffleIcon } from "lucide-react";
 import { LANGUAGES } from "../constants";
+import Avatar from "../components/Avatar";
 
 const OnboardingPage = () => {
   const { authUser } = useAuthUser();
@@ -57,10 +58,9 @@ const OnboardingPage = () => {
               {/* IMAGE PREVIEW */}
               <div className="size-32 rounded-full bg-base-300 overflow-hidden">
                 {formState.profilePic ? (
-                  <img
-                    src={formState.profilePic}
-                    alt="Profile Preview"
-                    className="w-full h-full object-cover"
+                  <Avatar 
+                    user={formState} 
+                    size="2xl" 
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full">

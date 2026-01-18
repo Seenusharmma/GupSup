@@ -5,6 +5,7 @@ import { MapPinIcon, CheckCircleIcon, UserPlusIcon, ArrowLeft } from "lucide-rea
 import { capitialize } from "../lib/utils";
 import { getLanguageFlag } from "../components/FriendCard";
 import { Link } from "react-router";
+import Avatar from "../components/Avatar";
 
 const DiscoverPage = () => {
     const queryClient = useQueryClient();
@@ -68,11 +69,7 @@ const DiscoverPage = () => {
                                    <div key={user._id} className="flex items-center gap-3 p-4 hover:bg-wa-gray-50 dark:hover:bg-wa-gray-600 transition-colors cursor-pointer">
                                      {/* Avatar */}
                                      <div className="relative">
-                                       <img 
-                                         src={user.profilePic || "/avatar.png"} 
-                                         alt={user.fullName} 
-                                         className="w-12 h-12 rounded-full object-cover" 
-                                       />
+                                       <Avatar user={user} size="large" />
                                      </div>
                 
                                      {/* Content */}

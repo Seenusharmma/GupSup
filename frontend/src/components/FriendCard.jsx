@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { LANGUAGE_TO_FLAG } from "../constants";
 import { MessageCircle } from "lucide-react";
+import Avatar from "./Avatar";
 
 const FriendCard = ({ friend }) => {
   return (
@@ -15,8 +16,8 @@ const FriendCard = ({ friend }) => {
         {/* User Info */}
         <div className="flex items-center gap-3">
           <div className="avatar relative">
-            <div className="size-14 rounded-full overflow-hidden">
-              <img src={friend.profilePic} alt={friend.fullName} className="w-full h-full object-cover" />
+            <div className="size-14 rounded-full overflow-hidden flex items-center justify-center">
+               <Avatar user={friend} size="large" />
             </div>
             {/* Online indicator (optional - can be connected to real status) */}
             <div 
