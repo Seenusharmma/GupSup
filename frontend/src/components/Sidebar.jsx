@@ -29,7 +29,7 @@ const Sidebar = () => {
       {/* Header */}
       <div className="h-[60px] flex items-center justify-between px-4 shrink-0 bg-wa-gray-50 dark:bg-wa-gray-700 border-b border-wa-gray-200 dark:border-wa-gray-600">
         {/* Profile Picture */}
-        <div className="cursor-pointer" onClick={() => navigate("/")}>
+        <div className="cursor-pointer" onClick={() => navigate("/profile")}>
           <Avatar user={authUser} size="medium" />
         </div>
 

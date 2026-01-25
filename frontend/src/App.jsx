@@ -1,4 +1,3 @@
-
 import { Navigate, Route, Routes } from "react-router";
 
 import HomePage from "./pages/HomePage.jsx";
@@ -10,6 +9,7 @@ import ChatPage from "./pages/ChatPage.jsx";
 import OnboardingPage from "./pages/OnboardingPage.jsx";
 import DiscoverPage from "./pages/DiscoverPage.jsx";
 import PlaceholderPage from "./pages/PlaceholderPage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 
 import { Toaster } from "react-hot-toast";
 
@@ -47,9 +47,11 @@ const App = () => {
         {
           id: authUser._id,
           name: authUser.fullName,
-          image: authUser.profilePic,
+          image: authUser.profilePic?.startsWith("data:")
+            ? undefined
+            : authUser.profilePic,
         },
-        tokenData.token
+        tokenData.token,
       );
 
       setChatClient(client);
@@ -63,7 +65,11 @@ const App = () => {
   const isAuthenticated = Boolean(authUser);
   const isOnboarded = authUser?.isOnboarded;
 
-  if (isLoading || (isAuthenticated && isTokenLoading) || (isAuthenticated && !chatClient))
+  if (
+    isLoading ||
+    (isAuthenticated && isTokenLoading) ||
+    (isAuthenticated && !chatClient)
+  )
     return <PageLoader />;
 
   return (
@@ -95,7 +101,7 @@ const App = () => {
                 )
               }
             />
-             <Route
+            <Route
               path="/notifications"
               element={
                 isOnboarded ? (
@@ -103,44 +109,31 @@ const App = () => {
                     <NotificationsPage />
                   </Layout>
                 ) : (
-                   <Navigate to="/onboarding" />
+                  <Navigate to="/onboarding" />
                 )
               }
             />
             {/* Friends/Home equivalent if needed, for now / is placeholder */}
-             <Route
+            <Route
               path="/friends"
               element={
                 isOnboarded ? (
-                   <Layout>
+                  <Layout>
                     <HomePage />
                   </Layout>
                 ) : (
-                   <Navigate to="/onboarding" />
+                  <Navigate to="/onboarding" />
                 )
               }
             />
 
-
             <Route path="/call/:id" element={<CallPage />} />
-            
-             <Route
-              path="/signup"
-              element={<Navigate to="/" />}
-            />
+
+            <Route path="/signup" element={<Navigate to="/" />} />
+            <Route path="/login" element={<Navigate to="/" />} />
             <Route
-              path="/login"
-              element={<Navigate to="/" />}
-            />
-             <Route
               path="/onboarding"
-               element={
-                 !isOnboarded ? (
-                    <OnboardingPage />
-                  ) : (
-                    <Navigate to="/" />
-                  )
-              }
+              element={!isOnboarded ? <OnboardingPage /> : <Navigate to="/" />}
             />
             <Route
               path="/discover"
@@ -154,7 +147,19 @@ const App = () => {
                 )
               }
             />
-             <Route
+            <Route
+              path="/profile"
+              element={
+                isOnboarded ? (
+                  <Layout>
+                    <ProfilePage />
+                  </Layout>
+                ) : (
+                  <Navigate to="/onboarding" />
+                )
+              }
+            />
+            <Route
               path="/updates"
               element={
                 isOnboarded ? (
@@ -166,7 +171,7 @@ const App = () => {
                 )
               }
             />
-             <Route
+            <Route
               path="/communities"
               element={
                 isOnboarded ? (
@@ -178,7 +183,7 @@ const App = () => {
                 )
               }
             />
-             <Route
+            <Route
               path="/calls"
               element={
                 isOnboarded ? (
@@ -202,10 +207,16 @@ const App = () => {
             path="/login"
             element={!isAuthenticated ? <LoginPage /> : <Navigate to="/" />}
           />
-           <Route
+          <Route
             path="/onboarding"
-            element={isAuthenticated && !isOnboarded ? <OnboardingPage /> : <Navigate to="/login" />}
-           />
+            element={
+              isAuthenticated && !isOnboarded ? (
+                <OnboardingPage />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       )}

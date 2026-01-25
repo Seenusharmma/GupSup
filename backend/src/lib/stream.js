@@ -14,7 +14,15 @@ const streamClient = StreamChat.getInstance(apiKey, apiSecret);
 
 export const upsertStreamUser = async (userData) => {
   try {
-    await streamClient.upsertUsers([userData]);
+    // Stream has a limit on user data size (approx 5KB).
+    // Large Base64 images will cause a "Payload Too Large" error.
+    // We filter them out here if they are too big, preserving the rest of the user data.
+    const streamUser = { ...userData };
+    if (streamUser.image && streamUser.image.length > 4000) {
+      delete streamUser.image;
+    }
+
+    await streamClient.upsertUsers([streamUser]);
     return userData;
   } catch (error) {
     console.error("Error upserting Stream user:", error);

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ShipWheelIcon } from "lucide-react";
+import { useState, useRef } from "react"; // Added useRef
+import { ShipWheelIcon, ShuffleIcon, Camera } from "lucide-react"; // Added Camera
 import { Link } from "react-router";
 
 import useSignUp from "../hooks/useSignUp";
@@ -9,7 +9,27 @@ const SignUpPage = () => {
     fullName: "",
     email: "",
     password: "",
+    profilePic: `https://avatar.iran.liara.run/public/${Math.floor(Math.random() * 100) + 1}.png`,
   });
+
+  const fileInputRef = useRef(null);
+
+  const handleRandomAvatar = () => {
+    const idx = Math.floor(Math.random() * 100) + 1;
+    const randomAvatar = `https://avatar.iran.liara.run/public/${idx}.png`;
+    setSignupData({ ...signupData, profilePic: randomAvatar });
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSignupData({ ...signupData, profilePic: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // This is how we did it at first, without using our custom hook
   // const queryClient = useQueryClient();
@@ -60,6 +80,47 @@ const SignUpPage = () => {
                   <h2 className="text-xl font-semibold">Create an Account</h2>
                   <p className="text-sm opacity-70">
                     Join Streamify and start your language learning adventure!
+                  </p>
+                </div>
+
+                {/* AVATAR SELECTION */}
+                <div className="flex flex-col items-center gap-4">
+                  <div className="relative">
+                    <div className="size-24 rounded-full bg-base-300 overflow-hidden ring-4 ring-base-200">
+                      <img
+                        src={signupData.profilePic}
+                        alt="Profile Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRandomAvatar}
+                      className="absolute bottom-0 right-0 p-1.5 bg-base-100 text-base-content rounded-full hover:bg-base-200 transition-colors shadow-lg border border-base-300"
+                      title="Generate new avatar"
+                    >
+                      <ShuffleIcon className="size-4" />
+                    </button>
+                    {/* Upload Button */}
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="absolute bottom-0 left-0 p-1.5 bg-primary text-primary-content rounded-full hover:bg-primary-focus transition-colors shadow-lg"
+                      title="Upload image"
+                    >
+                      <Camera className="size-4" />
+                    </button>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+                  </div>
+                  <p className="text-xs text-center opacity-60 max-w-[200px]">
+                    This will be your profile picture. Click shuffle to change
+                    it!
                   </p>
                 </div>
 
