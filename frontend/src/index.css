@@ -35,6 +35,16 @@
 
 /* Hide default stream theme background if interfering */
 .str-video__paginated-grid-layout {
-    background: transparent !important;
+  background: transparent !important;
 }
 
+@media (max-width: 640px) {
+  .str-video__call-controls__button {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .str-video__call-controls {
+    gap: 0.75rem !important;
+  }
+}

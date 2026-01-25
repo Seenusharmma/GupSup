@@ -5,17 +5,17 @@ import BottomNav from "./BottomNav";
 const Layout = ({ children }) => {
   const location = useLocation();
   const isHomePage = location.pathname === "/";
-  const isChatPage = location.pathname.startsWith('/chat/');
+  const isChatPage = location.pathname.startsWith("/chat/");
 
   return (
     <div className="flex h-screen overflow-hidden antialiased bg-wa-gray-50 dark:bg-wa-gray-700 text-wa-gray-800 dark:text-wa-gray-100">
-        {/* Sidebar - Hidden on mobile unless on home */}
-        <div className={`${isHomePage ? 'flex' : 'hidden'} md:flex h-full`}>
-            <Sidebar />
-        </div>
-        
-        {/* Main Content - Hidden on mobile if on home, but we need to refine this for other tabs */}
-        {/* On mobile: 
+      {/* Sidebar - Hidden on mobile unless on home */}
+      <div className={`${isHomePage ? "flex" : "hidden"} md:flex h-full`}>
+        <Sidebar />
+      </div>
+
+      {/* Main Content - Hidden on mobile if on home, but we need to refine this for other tabs */}
+      {/* On mobile: 
             - Home: Sidebar visible, Main hidden (usually) -> But Wait. 
             - Chat: Sidebar hidden, Main visible.
             - Updates/Calls: Sidebar hidden? No, these are main views replacing the Sidebar/Home view. 
@@ -38,12 +38,14 @@ const Layout = ({ children }) => {
             Sidebar: visible on '/' AND desktop.
             Main: visible on NOT '/' OR desktop.
          */}
-        <main className={`flex-1 flex flex-col min-w-0 relative overflow-hidden ${!isHomePage ? 'flex' : 'hidden'} md:flex`}>
-            {children}
-        </main>
+      <main
+        className={`flex-1 flex flex-col min-w-0 relative overflow-hidden ${!isHomePage ? "flex" : "hidden"} md:flex transition-opacity duration-200`}
+      >
+        {children}
+      </main>
 
-        {/* Bottom Nav - Mobile Only, Hidden in active chat */}
-        {!isChatPage && <BottomNav />}
+      {/* Bottom Nav - Mobile Only, Hidden in active chat */}
+      {!isChatPage && <BottomNav />}
     </div>
   );
 };
